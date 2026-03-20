@@ -1018,7 +1018,7 @@ function DirectBooking({ requests, rooms, adminUser, emailConfig, schoolName, sh
     .sort((a,b)=>a.bookings[0].date.localeCompare(b.bookings[0].date));
 
   const needsEndDate = form.pattern !== "once";
-  const needsDays    = form.pattern === "weekly" || form.pattern === "biweekly";
+  const needsDays    = form.pattern !== "once" && form.pattern !== "monthly" && form.pattern !== "daily";
 
   return (
     <>
@@ -1084,7 +1084,7 @@ function DirectBooking({ requests, rooms, adminUser, emailConfig, schoolName, sh
 
         {/* ── Recurrence section ── */}
         <div style={{marginTop:"1rem",padding:"1rem 1.1rem",background:"white",borderRadius:10,border:"1px solid var(--border)"}}>
-          <div style={{fontWeight:700,fontSize:".8rem",color:"var(--navy)",textTransform:"uppercase",letterSpacing:".05em",marginBottom:".75rem"}}>🔁 Recurrence</div>
+          <div style={{fontWeight:700,fontSize:".85rem",color:"var(--navy)",textTransform:"uppercase",letterSpacing:".05em",marginBottom:".75rem"}}>🔁 Recurrence — <span style={{fontWeight:400,textTransform:"none",color:"var(--slate)",fontSize:".82rem",letterSpacing:0}}>choose Weekly or Bi-weekly to pick specific days</span></div>
           <div className="form-grid">
             <div className="form-group">
               <label className="form-label">Repeat Pattern *</label>
@@ -1104,28 +1104,49 @@ function DirectBooking({ requests, rooms, adminUser, emailConfig, schoolName, sh
             )}
           </div>
 
-          {/* Day-of-week picker for weekly / biweekly */}
+          {/* Day-of-week picker — shown for weekly and biweekly */}
           {needsDays && (
-            <div style={{marginTop:".85rem"}}>
-              <div style={{fontSize:".77rem",fontWeight:600,color:"var(--slate)",textTransform:"uppercase",letterSpacing:".05em",marginBottom:".5rem"}}>Days of Week *</div>
-              <div style={{display:"flex",gap:7,flexWrap:"wrap"}}>
+            <div style={{marginTop:"1rem",background:"#f0f4ff",border:"2px solid #c7d2fe",borderRadius:10,padding:"1rem 1.1rem"}}>
+              <div style={{fontSize:".85rem",fontWeight:700,color:"#3730a3",marginBottom:".65rem"}}>
+                📅 Which days of the week? (select all that apply)
+              </div>
+              <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
                 {DAY_LABELS.map((label,i)=>{
                   const active = form.selectedDays.includes(i);
                   return (
-                    <button key={i} onClick={()=>toggleDay(i)}
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={()=>toggleDay(i)}
                       style={{
-                        padding:"6px 14px",borderRadius:20,border:"1.5px solid",cursor:"pointer",
-                        fontFamily:"'DM Sans',sans-serif",fontWeight:600,fontSize:".82rem",
-                        background: active?"var(--navy)":"white",
-                        color: active?"white":"var(--slate)",
-                        borderColor: active?"var(--navy)":"var(--border)",
+                        padding:"8px 18px",
+                        borderRadius:24,
+                        border:"2px solid",
+                        cursor:"pointer",
+                        fontFamily:"inherit",
+                        fontWeight:700,
+                        fontSize:".9rem",
+                        background: active?"#3730a3":"white",
+                        color: active?"white":"#4b5563",
+                        borderColor: active?"#3730a3":"#d1d5db",
                         transition:"all .15s",
+                        boxShadow: active?"0 2px 8px rgba(55,48,163,.3)":"none",
                       }}>
                       {label}
                     </button>
                   );
                 })}
               </div>
+              {form.selectedDays.length === 0 && (
+                <div style={{marginTop:".5rem",fontSize:".78rem",color:"#dc2626",fontWeight:600}}>
+                  ⚠ Please select at least one day
+                </div>
+              )}
+              {form.selectedDays.length > 0 && (
+                <div style={{marginTop:".5rem",fontSize:".78rem",color:"#15803d",fontWeight:600}}>
+                  ✓ Selected: {form.selectedDays.map(d=>DAY_LABELS[d]).join(", ")}
+                </div>
+              )}
             </div>
           )}
 
